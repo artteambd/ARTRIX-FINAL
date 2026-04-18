@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChartX Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-primary: #0f0f23;
+      --bg-secondary: #1a1a2e;
+      --bg-card: #16213e;
+      --accent: #e94560;
+      --accent-light: #ff6b6b;
+      --success: #00d9a5;
+      --warning: #ffc107;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0b0;
+      --border: #2a2a4e;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+    
+    .login-box {
+      background: var(--bg-card);
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid var(--border);
+    }
+    
+    .login-box h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .login-box p {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+    }
+    
+    .error-msg {
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    /* Dashboard Styles */
+    .dashboard { display: none; }
+    
+    .dashboard.active { display: block; }
+    
+    .header {
+      background: var(--bg-secondary);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .header h1 {
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .header .logout-btn {
+      padding: 0.5rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .header .logout-btn:hover {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .main-content {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: var(--bg-card);
+      padding: 1.5rem;
+      border-radius: 15px;
+      border: 1px solid var(--border);
+    }
+    
+    .stat-card h3 {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .stat-card.accent .value {
+      color: var(--accent);
+    }
+    
+    .stat-card.success .value {
+      color: var(--success);
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+      border-radius: 8px;
+    }
+    
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .users-table {
+      width: 100%;
+      background: var(--bg-card);
+      border-radius: 15px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    
+    .users-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .users-table th,
+    .users-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .users-table th {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .users-table tr:hover {
+      background: rgba(233, 69, 96, 0.05);
+    }
+    
+    .badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .badge.free { background: #2a2a4e; color: var(--text-secondary); }
+    .badge.nano { background: #1e3a5f; color: #60a5fa; }
+    .badge.starter { background: #1e3a3a; color: #34d399; }
+    .badge.popular { background: #3a2a1e; color: #fbbf24; }
+    .badge.expert { background: #3a1e3a; color: #c084fc; }
+    .badge.investor { background: #3a1e1e; color: var(--accent); }
+    
+    .badge.active { background: rgba(0, 217, 165, 0.2); color: var(--success); }
+    .badge.blocked { background: rgba(233, 69, 96, 0.2); color: var(--accent); }
+    
+    .action-btn {
+      padding: 0.4rem 0.8rem;
+      margin: 0.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.3s;
+    }
+    
+    .action-btn.edit { background: #1e3a5f; color: #60a5fa; }
+    .action-btn.block { background: #3a2a1e; color: #fbbf24; }
+    .action-btn.delete { background: #3a1e1e; color: var(--accent); }
+    .action-btn.warn { background: #2a2a4e; color: #c084fc; }
+    
+    .action-btn:hover { transform: scale(1.05); }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal.active { display: flex; }
+    
+    .modal-content {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 500px;
+      border: 1px solid var(--border);
+    }
+    
+    .modal-content h2 {
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+    }
+    
+    .modal-close {
+      float: right;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .search-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 0.75rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+    
+    @media (max-width: 768px) {
+      .main-content { padding: 1rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .tabs { flex-wrap: wrap; }
+      .users-table { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div class="login-container" id="loginScreen">
+    <div class="login-box">
+      <h1>🎯 ChartX Admin</h1>
+      <p>Enter your credentials to access the dashboard</p>
+      <div class="error-msg" id="loginError">Invalid credentials</div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Enter username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn">Login to Dashboard</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <header class="header">
+      <h1>🎯 ChartX Admin Dashboard</h1>
+      <button class="logout-btn" id="logoutBtn">Logout</button>
+    </header>
+
+    <main class="main-content">
+      <!-- Stats -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <h3>Total Users</h3>
+          <div class="value" id="totalUsers">--</div>
+        </div>
+        <div class="stat-card success">
+          <h3>Active Users</h3>
+          <div class="value" id="activeUsers">--</div>
+        </div>
+        <div class="stat-card accent">
+          <h3>Signals Today</h3>
+          <div class="value" id="signalsToday">--</div>
+        </div>
+        <div class="stat-card">
+          <h3>Charts Analyzed</h3>
+          <div class="value" id="chartsAnalyzed">--</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="users">Users</button>
+        <button class="tab-btn" data-tab="create">Create User</button>
+        <button class="tab-btn" data-tab="broadcast">Broadcast</button>
+      </div>
+
+      <!-- Users Tab -->
+      <div class="tab-content active" id="usersTab">
+        <input type="text" class="search-box" id="searchUsers" placeholder="Search users by email...">
+        <div class="users-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Membership</th>
+                <th>Credits</th>
+                <th>Status</th>
+                <th>Signals</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="7" class="loading">Loading users...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Create User Tab -->
+      <div class="tab-content" id="createTab">
+        <div class="login-box" style="max-width: 500px;">
+          <h2 style="color: var(--accent); margin-bottom: 1.5rem;">Create New User</h2>
+          <form id="createUserForm">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="newEmail" placeholder="user@example.com" required>
+            </div>
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" id="newName" placeholder="User Name">
+            </div>
+            <div class="form-group">
+              <label>Password (optional)</label>
+              <input type="password" id="newPassword" placeholder="Leave empty for license-only">
+            </div>
+            <div class="form-group">
+              <label>Membership</label>
+              <select id="newMembership" style="width: 100%; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary);">
+                <option value="free">Free</option>
+                <option value="nano">Nano</option>
+                <option value="starter">Starter</option>
+                <option value="popular">Popular</option>
+                <option value="expert">Expert</option>
+                <option value="investor">Investor</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Credits</label>
+              <input type="number" id="newCredits" value="5" min="0">
+            </div>
+            <div class="form-group">
+              <label>Expires At (optional)</label>
+              <input type="datetime-local" id="newExpiry" style="width: 100%; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary);">
+            </div>
+            <button type="submit" class="btn">Create User</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Broadcast Tab -->
+      <div class="tab-content" id="broadcastTab">
+        <div class="login-box" style="max-width: 500px;">
+          <h2 style="color: var(--accent); margin-bottom: 1.5rem;">Broadcast Message</h2>
+          <form id="broadcastForm">
+            <div class="form-group">
+              <label>Message Type</label>
+              <select id="broadcastType" style="width: 100%; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary);">
+                <option value="info">Info</option>
+                <option value="warning">Warning</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea id="broadcastMessage" rows="4" placeholder="Enter your message..." style="width: 100%; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); resize: vertical;"></textarea>
+            </div>
+            <button type="submit" class="btn">Send to All Users</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2>Edit User</h2>
+      <form id="editUserForm">
+        <input type="hidden" id="editUserId">
+        <div class="form-group">
+          <label>Credits</label>
+          <input type="number" id="editCredits" min="0">
+        </div>
+        <div class="form-group">
+          <label>Membership</label>
+          <select id="editMembership" style="width: 100%; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary);">
+            <option value="free">Free</option>
+            <option value="nano">Nano</option>
+            <option value="starter">Starter</option>
+            <option value="popular">Popular</option>
+            <option value="expert">Expert</option>
+            <option value="investor">Investor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Extend License (days)</label>
+          <input type="number" id="editExtendDays" min="0" placeholder="Enter days to extend">
+        </div>
+        <button type="submit" class="btn">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Warning Modal -->
+  <div class="modal" id="warningModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeWarningModal()">&times;</button>
+      <h2>Send Warning</h2>
+      <form id="warningForm">
+        <input type="hidden" id="warnUserId">
+        <div class="form-group">
+          <label>Warning Type</label>
+          <select id="warnType" style="width: 100%; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary);">
+            <option value="info">Info</option>
+            <option value="warning">Warning</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea id="warnMessage" rows="4" placeholder="Enter warning message..." style="width: 100%; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); resize: vertical;"></textarea>
+        </div>
+        <button type="submit" class="btn">Send Warning</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
